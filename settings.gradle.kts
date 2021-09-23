@@ -65,6 +65,8 @@ include(":extensions:iam:distributed-identity:registration-service")
 include(":extensions:iam:distributed-identity:registration-service-api")
 include(":extensions:iam:distributed-identity:identity-common-test")
 include(":extensions:catalog:catalog-service")
+include(":extensions:transfer-functions:transfer-functions-spi")
+include(":extensions:transfer-functions:transfer-functions-core")
 
 // modules for launchers, i.e. runnable compositions of the app
 include(":launchers:basic")
