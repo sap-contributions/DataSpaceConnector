@@ -76,6 +76,7 @@ public class AssetApiExtension implements ServiceExtension {
     @Override
     public void initialize(ServiceExtensionContext context) {
         var monitor = context.getMonitor();
+        var audit = context.getAudit();
 
         var assetObservable = new AssetObservableImpl();
         assetObservable.registerListener(new AssetEventListener(clock, eventRouter));
@@ -87,7 +88,7 @@ public class AssetApiExtension implements ServiceExtension {
         transformerRegistry.register(new DataAddressDtoToDataAddressTransformer());
         transformerRegistry.register(new AssetToAssetDtoTransformer());
 
-        webService.registerResource(config.getContextAlias(), new AssetApiController(monitor, assetService, transformerRegistry));
+        webService.registerResource(config.getContextAlias(), new AssetApiController(monitor, audit, assetService, transformerRegistry));
     }
 
 }

@@ -16,6 +16,7 @@
 package org.eclipse.dataspaceconnector.boot.system;
 
 import org.eclipse.dataspaceconnector.spi.EdcException;
+import org.eclipse.dataspaceconnector.spi.audit.AuditLogger;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.system.ConfigurationExtension;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
@@ -42,11 +43,12 @@ public class DefaultServiceExtensionContext implements ServiceExtensionContext {
     private String connectorId;
     private Config config;
 
-    public DefaultServiceExtensionContext(TypeManager typeManager, Monitor monitor, Telemetry telemetry, List<ConfigurationExtension> configurationExtensions) {
+    public DefaultServiceExtensionContext(TypeManager typeManager, Monitor monitor, AuditLogger audit, Telemetry telemetry, List<ConfigurationExtension> configurationExtensions) {
         this.configurationExtensions = configurationExtensions;
         // register as services
         registerService(TypeManager.class, typeManager);
         registerService(Monitor.class, monitor);
+        registerService(AuditLogger.class, audit);
         registerService(Telemetry.class, telemetry);
         registerService(Clock.class, Clock.systemUTC());
     }

@@ -31,6 +31,8 @@ import org.eclipse.dataspaceconnector.api.datamanagement.asset.model.AssetEntryD
 import org.eclipse.dataspaceconnector.api.datamanagement.asset.service.AssetService;
 import org.eclipse.dataspaceconnector.api.query.QuerySpecDto;
 import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
+import org.eclipse.dataspaceconnector.spi.audit.AuditInformation;
+import org.eclipse.dataspaceconnector.spi.audit.AuditLogger;
 import org.eclipse.dataspaceconnector.spi.exception.InvalidRequestException;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
@@ -53,11 +55,13 @@ import static org.eclipse.dataspaceconnector.api.ServiceResultHandler.mapToExcep
 public class AssetApiController implements AssetApi {
 
     private final Monitor monitor;
+    private final AuditLogger audit;
     private final AssetService service;
     private final DtoTransformerRegistry transformerRegistry;
 
-    public AssetApiController(Monitor monitor, AssetService service, DtoTransformerRegistry transformerRegistry) {
+    public AssetApiController(Monitor monitor, AuditLogger audit, AssetService service, DtoTransformerRegistry transformerRegistry) {
         this.monitor = monitor;
+        this.audit = audit;
         this.service = service;
         this.transformerRegistry = transformerRegistry;
     }
@@ -76,6 +80,7 @@ public class AssetApiController implements AssetApi {
         var dataAddress = dataAddressResult.getContent();
         var asset = assetResult.getContent();
 
+        audit.log(new AuditInformation("Create Asset", "dummyuser", "dummyIP", format("Creating asset %s", asset.getId())));
         var result = service.create(asset, dataAddress);
 
         if (result.succeeded()) {

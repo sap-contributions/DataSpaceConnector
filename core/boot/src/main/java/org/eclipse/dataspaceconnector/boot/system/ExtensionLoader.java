@@ -19,9 +19,12 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import org.eclipse.dataspaceconnector.boot.system.injection.InjectorImpl;
 import org.eclipse.dataspaceconnector.boot.system.injection.lifecycle.ExtensionLifecycleManager;
+import org.eclipse.dataspaceconnector.spi.audit.AuditLogger;
+import org.eclipse.dataspaceconnector.spi.audit.ConsoleAuditLogger;
 import org.eclipse.dataspaceconnector.spi.monitor.ConsoleMonitor;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.monitor.MultiplexingMonitor;
+import org.eclipse.dataspaceconnector.spi.system.AuditExtension;
 import org.eclipse.dataspaceconnector.spi.system.MonitorExtension;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtension;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
@@ -93,6 +96,23 @@ public class ExtensionLoader {
         }
 
         return availableMonitors.get(0).getMonitor();
+    }
+
+    public static @NotNull AuditLogger loadAudit() {
+        var loader = ServiceLoader.load(AuditExtension.class);
+        return loadAudit(loader.stream().map(ServiceLoader.Provider::get).collect(Collectors.toList()));
+    }
+
+    static @NotNull AuditLogger loadAudit(List<AuditExtension> availableAuditLoggers) {
+        if (availableAuditLoggers.isEmpty()) {
+            return new ConsoleAuditLogger();
+        }
+
+//        if (availableAuditLoggers.size() > 1) {
+//            return new MultiplexingMonitor(availableAuditLoggers.stream().map(AuditExtension::getAudit).collect(Collectors.toList()));
+//        }
+
+        return availableAuditLoggers.get(0).getAudit();
     }
 
     public static @NotNull Telemetry loadTelemetry() {

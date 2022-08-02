@@ -16,6 +16,7 @@ package org.eclipse.dataspaceconnector.demo.runtime;
 
 import org.eclipse.dataspaceconnector.boot.system.DefaultServiceExtensionContext;
 import org.eclipse.dataspaceconnector.boot.system.runtime.BaseRuntime;
+import org.eclipse.dataspaceconnector.spi.audit.AuditLogger;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.system.ConfigurationExtension;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtensionContext;
@@ -41,9 +42,9 @@ public class CustomRuntime extends BaseRuntime {
     }
 
     @Override
-    protected @NotNull ServiceExtensionContext createContext(TypeManager typeManager, Monitor monitor, Telemetry telemetry) {
+    protected @NotNull ServiceExtensionContext createContext(TypeManager typeManager, Monitor monitor, AuditLogger audit, Telemetry telemetry) {
         //override the default service extension context with a super customized one
-        return new SuperCustomExtensionContext(typeManager, monitor, telemetry, loadConfigurationExtensions());
+        return new SuperCustomExtensionContext(typeManager, monitor, audit, telemetry, loadConfigurationExtensions());
     }
 
     @Override
@@ -55,8 +56,8 @@ public class CustomRuntime extends BaseRuntime {
     }
 
     private static class SuperCustomExtensionContext extends DefaultServiceExtensionContext {
-        SuperCustomExtensionContext(TypeManager typeManager, Monitor monitor, Telemetry telemetry, List<ConfigurationExtension> configurationExtensions) {
-            super(typeManager, monitor, telemetry, configurationExtensions);
+        SuperCustomExtensionContext(TypeManager typeManager, Monitor monitor, AuditLogger audit, Telemetry telemetry, List<ConfigurationExtension> configurationExtensions) {
+            super(typeManager, monitor, audit, telemetry, configurationExtensions);
         }
     }
 }

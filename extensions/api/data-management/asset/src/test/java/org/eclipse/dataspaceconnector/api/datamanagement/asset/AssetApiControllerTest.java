@@ -23,6 +23,7 @@ import org.eclipse.dataspaceconnector.api.datamanagement.asset.service.AssetServ
 import org.eclipse.dataspaceconnector.api.query.QuerySpecDto;
 import org.eclipse.dataspaceconnector.api.result.ServiceResult;
 import org.eclipse.dataspaceconnector.api.transformer.DtoTransformerRegistry;
+import org.eclipse.dataspaceconnector.spi.audit.AuditLogger;
 import org.eclipse.dataspaceconnector.spi.exception.InvalidRequestException;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectExistsException;
 import org.eclipse.dataspaceconnector.spi.exception.ObjectNotFoundException;
@@ -55,7 +56,9 @@ public class AssetApiControllerTest {
     @BeforeEach
     void setUp() {
         var monitor = mock(Monitor.class);
-        controller = new AssetApiController(monitor, service, transformerRegistry);
+        var audit = mock(AuditLogger.class);
+
+        controller = new AssetApiController(monitor, audit, service, transformerRegistry);
     }
 
     @Test

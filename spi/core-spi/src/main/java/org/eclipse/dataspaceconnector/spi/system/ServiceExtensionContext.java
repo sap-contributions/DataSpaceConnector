@@ -15,6 +15,7 @@
 
 package org.eclipse.dataspaceconnector.spi.system;
 
+import org.eclipse.dataspaceconnector.spi.audit.AuditLogger;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.telemetry.Telemetry;
 import org.eclipse.dataspaceconnector.spi.types.TypeManager;
@@ -37,6 +38,13 @@ public interface ServiceExtensionContext extends SettingResolver {
      */
     default Monitor getMonitor() {
         return getService(Monitor.class);
+    }
+
+    /**
+     * Returns the system monitor.
+     */
+    default AuditLogger getAudit() {
+        return getService(AuditLogger.class);
     }
 
     /**

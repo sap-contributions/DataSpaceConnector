@@ -21,6 +21,7 @@ import org.eclipse.dataspaceconnector.boot.system.DefaultServiceExtensionContext
 import org.eclipse.dataspaceconnector.boot.system.ExtensionLoader;
 import org.eclipse.dataspaceconnector.boot.system.ServiceLocator;
 import org.eclipse.dataspaceconnector.boot.system.ServiceLocatorImpl;
+import org.eclipse.dataspaceconnector.spi.audit.AuditLogger;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.system.ConfigurationExtension;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtension;
@@ -46,7 +47,7 @@ import static org.eclipse.dataspaceconnector.boot.system.ExtensionLoader.loadTel
  * <ul>
  *     <li>{@link BaseRuntime#createTypeManager()}: instantiates a new {@link TypeManager}</li>
  *     <li>{@link BaseRuntime#createMonitor()} : instantiates a new {@link Monitor}</li>
- *     <li>{@link BaseRuntime#createContext(TypeManager, Monitor, Telemetry)}: creates a new {@link DefaultServiceExtensionContext} and invokes its {@link DefaultServiceExtensionContext#initialize()} method</li>
+ *     <li>{@link BaseRuntime#createContext(TypeManager, Monitor, AuditLogger, Telemetry)}: creates a new {@link DefaultServiceExtensionContext} and invokes its {@link DefaultServiceExtensionContext#initialize()} method</li>
  *     <li>{@link BaseRuntime#createExtensions()}: creates a list of {@code ServiceExtension} objects. By default, these are created through {@link ExtensionLoader#loadServiceExtensions()}</li>
  *     <li>{@link BaseRuntime#bootExtensions(ServiceExtensionContext, List)}: initializes the service extensions by putting them through their lifecycle.
  *     By default this calls {@link ExtensionLoader#bootServiceExtensions(List, ServiceExtensionContext)} </li>
@@ -59,6 +60,7 @@ public class BaseRuntime {
     private final AtomicReference<HealthCheckResult> startupStatus = new AtomicReference<>(HealthCheckResult.failed("Startup not complete"));
     private final ExtensionLoader extensionLoader;
     protected Monitor monitor;
+    protected AuditLogger audit;
     private final List<ServiceExtension> serviceExtensions = new ArrayList<>();
 
     public BaseRuntime() {
@@ -99,16 +101,21 @@ public class BaseRuntime {
         var typeManager = createTypeManager();
         monitor = createMonitor();
         MonitorProvider.setInstance(monitor);
+        audit = createAudit();
 
         var telemetry = loadTelemetry();
 
-        var context = createContext(typeManager, monitor, telemetry);
+        var context = createContext(typeManager, monitor, audit, telemetry);
         initializeContext(context);
         return context;
     }
 
+    protected AuditLogger createAudit() {
+        return ExtensionLoader.loadAudit();
+    }
+
     /**
-     * Initializes the context. If {@link BaseRuntime#createContext(TypeManager, Monitor, Telemetry)} is overridden and the (custom) context
+     * Initializes the context. If {@link BaseRuntime#createContext(TypeManager, Monitor, AuditLogger, Telemetry)} is overridden and the (custom) context
      * needs to be initialized, this method should be overridden as well.
      *
      * @param context The context.
@@ -159,11 +166,12 @@ public class BaseRuntime {
      *
      * @param typeManager The TypeManager (for JSON de-/serialization)
      * @param monitor     a Monitor
+     * @param audit       a AuditLogger
      * @return a {@code ServiceExtensionContext}
      */
     @NotNull
-    protected ServiceExtensionContext createContext(TypeManager typeManager, Monitor monitor, Telemetry telemetry) {
-        return new DefaultServiceExtensionContext(typeManager, monitor, telemetry, loadConfigurationExtensions());
+    protected ServiceExtensionContext createContext(TypeManager typeManager, Monitor monitor, AuditLogger audit, Telemetry telemetry) {
+        return new DefaultServiceExtensionContext(typeManager, monitor, audit, telemetry, loadConfigurationExtensions());
     }
 
     protected List<ConfigurationExtension> loadConfigurationExtensions() {

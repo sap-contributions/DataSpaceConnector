@@ -20,6 +20,7 @@ import org.eclipse.dataspaceconnector.boot.system.ServiceLocator;
 import org.eclipse.dataspaceconnector.boot.system.ServiceLocatorImpl;
 import org.eclipse.dataspaceconnector.boot.system.runtime.BaseRuntime;
 import org.eclipse.dataspaceconnector.spi.EdcException;
+import org.eclipse.dataspaceconnector.spi.audit.AuditLogger;
 import org.eclipse.dataspaceconnector.spi.monitor.Monitor;
 import org.eclipse.dataspaceconnector.spi.system.ConfigurationExtension;
 import org.eclipse.dataspaceconnector.spi.system.ServiceExtension;
@@ -130,8 +131,8 @@ public class EdcExtension extends BaseRuntime implements BeforeTestExecutionCall
     }
 
     @Override
-    protected @NotNull ServiceExtensionContext createContext(TypeManager typeManager, Monitor monitor, Telemetry telemetry) {
-        context = new DefaultServiceExtensionContext(typeManager, monitor, telemetry, loadConfigurationExtensions());
+    protected @NotNull ServiceExtensionContext createContext(TypeManager typeManager, Monitor monitor, AuditLogger audit, Telemetry telemetry) {
+        context = new DefaultServiceExtensionContext(typeManager, monitor, audit, telemetry, loadConfigurationExtensions());
         return context;
     }
 
