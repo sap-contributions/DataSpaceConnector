@@ -9,6 +9,7 @@
  *
  *  Contributors:
  *       Amadeus - initial API and implementation
+ *       SAP SE  - added DataPlaneTokenGenerationService support for data plane dependent token services
  *
  */
 
@@ -18,7 +19,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import org.eclipse.edc.connector.transfer.dataplane.spi.proxy.ConsumerPullTransferEndpointDataReferenceCreationRequest;
 import org.eclipse.edc.connector.transfer.dataplane.spi.proxy.ConsumerPullTransferEndpointDataReferenceService;
 import org.eclipse.edc.connector.transfer.dataplane.spi.security.DataEncrypter;
-import org.eclipse.edc.jwt.spi.TokenGenerationService;
+import org.eclipse.edc.jwt.spi.DataPlaneTokenGenerationService;
 import org.eclipse.edc.spi.result.Result;
 import org.eclipse.edc.spi.types.TypeManager;
 import org.eclipse.edc.spi.types.domain.edr.EndpointDataReference;
@@ -31,19 +32,18 @@ import java.util.HashMap;
 import static org.eclipse.edc.connector.transfer.dataplane.spi.TransferDataPlaneConstants.CONTRACT_ID;
 
 public class ConsumerPullTransferEndpointDataReferenceServiceImpl implements ConsumerPullTransferEndpointDataReferenceService {
-
-    private final TokenGenerationService tokenGenerationService;
+    private final DataPlaneTokenGenerationService dataPlaneTokenGenerationService;
     private final TypeManager typeManager;
     private final long tokenValiditySeconds;
     private final DataEncrypter dataEncrypter;
     private final Clock clock;
 
-    public ConsumerPullTransferEndpointDataReferenceServiceImpl(TokenGenerationService tokenGenerationService, TypeManager typeManager, long tokenValiditySeconds, DataEncrypter dataEncrypter, Clock clock) {
-        this.tokenGenerationService = tokenGenerationService;
+    public ConsumerPullTransferEndpointDataReferenceServiceImpl(DataPlaneTokenGenerationService dataPlaneTokenGenerationService, TypeManager typeManager, long tokenValiditySeconds, DataEncrypter dataEncrypter, Clock clock) {
         this.typeManager = typeManager;
         this.tokenValiditySeconds = tokenValiditySeconds;
         this.dataEncrypter = dataEncrypter;
         this.clock = clock;
+        this.dataPlaneTokenGenerationService = dataPlaneTokenGenerationService;
     }
 
     /**
@@ -54,7 +54,8 @@ public class ConsumerPullTransferEndpointDataReferenceServiceImpl implements Con
     public Result<EndpointDataReference> createProxyReference(@NotNull ConsumerPullTransferEndpointDataReferenceCreationRequest request) {
         var encryptedDataAddress = dataEncrypter.encrypt(typeManager.writeValueAsString(request.getContentAddress()));
         var decorator = new ConsumerPullTransferTokenDecorator(Date.from(clock.instant().plusSeconds(tokenValiditySeconds)), request.getContractId(), encryptedDataAddress);
-        var tokenGenerationResult = tokenGenerationService.generate(decorator);
+
+        var tokenGenerationResult = dataPlaneTokenGenerationService.generate(request.getProxyEndpoint(), decorator);
         if (tokenGenerationResult.failed()) {
             return Result.failure(tokenGenerationResult.getFailureMessages());
         }

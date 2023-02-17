@@ -15,6 +15,7 @@
 package org.eclipse.edc.connector.transfer.dataplane.proxy;
 
 import jakarta.ws.rs.core.HttpHeaders;
+import org.eclipse.edc.connector.transfer.dataplane.security.DefaultDataPlaneTokenGenerationServiceImpl;
 import org.eclipse.edc.connector.transfer.dataplane.spi.proxy.ConsumerPullTransferEndpointDataReferenceCreationRequest;
 import org.eclipse.edc.connector.transfer.dataplane.spi.security.DataEncrypter;
 import org.eclipse.edc.jwt.spi.TokenGenerationService;
@@ -59,10 +60,11 @@ class ConsumerPullTransferEndpointDataReferenceServiceImplTest {
     @BeforeEach
     public void setUp() {
         tokenGeneratorMock = mock(TokenGenerationService.class);
+        var dataPlaneTokenGenerationService = new DefaultDataPlaneTokenGenerationServiceImpl(tokenGeneratorMock);
         tokenValiditySeconds = random.nextLong(100L);
         encrypterMock = mock(DataEncrypter.class);
         Clock clock = Clock.fixed(now, UTC);
-        proxyManager = new ConsumerPullTransferEndpointDataReferenceServiceImpl(tokenGeneratorMock, TYPE_MANAGER, tokenValiditySeconds, encrypterMock, clock);
+        proxyManager = new ConsumerPullTransferEndpointDataReferenceServiceImpl(dataPlaneTokenGenerationService, TYPE_MANAGER, tokenValiditySeconds, encrypterMock, clock);
     }
 
     /**

@@ -10,6 +10,7 @@
  *  Contributors:
  *       Amadeus - initial API and implementation
  *       Mercedes-Benz Tech Innovation GmbH - DataEncrypter can be provided by extensions
+ *       SAP SE - DataPlaneTokenGenerationService can be provided by extensions
  *
  */
 
@@ -32,9 +33,9 @@ import org.eclipse.edc.connector.transfer.dataplane.validation.ExpirationDateVal
 import org.eclipse.edc.connector.transfer.spi.callback.ControlPlaneApiUrl;
 import org.eclipse.edc.connector.transfer.spi.edr.EndpointDataReferenceTransformerRegistry;
 import org.eclipse.edc.connector.transfer.spi.flow.DataFlowManager;
-import org.eclipse.edc.jwt.TokenGenerationServiceImpl;
 import org.eclipse.edc.jwt.TokenValidationRulesRegistryImpl;
 import org.eclipse.edc.jwt.TokenValidationServiceImpl;
+import org.eclipse.edc.jwt.spi.DataPlaneTokenGenerationService;
 import org.eclipse.edc.jwt.spi.TokenValidationService;
 import org.eclipse.edc.runtime.metamodel.annotation.Extension;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
@@ -65,7 +66,6 @@ public class TransferDataPlaneCoreExtension implements ServiceExtension {
      */
     @Deprecated(since = "milestone8")
     private static final String DEPRECATED_API_CONTEXT_ALIAS = "validation";
-
     @Inject
     private ContractNegotiationStore contractNegotiationStore;
 
@@ -105,6 +105,9 @@ public class TransferDataPlaneCoreExtension implements ServiceExtension {
     @Inject
     private TypeManager typeManager;
 
+    @Inject
+    private DataPlaneTokenGenerationService dataPlaneTokenGenerationService;
+
     @Override
     public String name() {
         return NAME;
@@ -121,6 +124,8 @@ public class TransferDataPlaneCoreExtension implements ServiceExtension {
 
         var consumerProxyTransformer = new ConsumerPullTransferProxyTransformer(proxyResolver, proxyReferenceService);
         transformerRegistry.registerTransformer(consumerProxyTransformer);
+
+        context.getMonitor().info("ivo - TransferDataPlaneCoreExtension - initialize");
     }
 
     /**
@@ -143,8 +148,7 @@ public class TransferDataPlaneCoreExtension implements ServiceExtension {
      */
     private ConsumerPullTransferEndpointDataReferenceService createDataProxyReferenceService(Config config, TypeManager typeManager) {
         var tokenValiditySeconds = config.getLong(TOKEN_VALIDITY_SECONDS, DEFAULT_TOKEN_VALIDITY_SECONDS);
-        var tokenGenerationService = new TokenGenerationServiceImpl(keyPairWrapper.get().getPrivate());
-        return new ConsumerPullTransferEndpointDataReferenceServiceImpl(tokenGenerationService, typeManager, tokenValiditySeconds, dataEncrypter, clock);
+        return new ConsumerPullTransferEndpointDataReferenceServiceImpl(dataPlaneTokenGenerationService, typeManager, tokenValiditySeconds, dataEncrypter, clock);
     }
 
     /**
