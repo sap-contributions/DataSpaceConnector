@@ -14,11 +14,9 @@
 
 package org.eclipse.edc.connector.transfer.dataplane.security;
 
-import org.eclipse.edc.connector.transfer.dataplane.spi.security.KeyPairWrapper;
 import org.eclipse.edc.jwt.spi.DataPlaneTokenGenerationService;
 import org.eclipse.edc.jwt.spi.JwtDecorator;
 import org.eclipse.edc.jwt.spi.TokenGenerationService;
-import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.spi.iam.TokenRepresentation;
 import org.eclipse.edc.spi.result.Result;
 import org.jetbrains.annotations.NotNull;
@@ -26,9 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class DefaultDataPlaneTokenGenerationServiceImpl implements DataPlaneTokenGenerationService {
-
-    @Inject
-    private KeyPairWrapper keyPairWrapper;
 
     private final TokenGenerationService tokenGenerationService;
 

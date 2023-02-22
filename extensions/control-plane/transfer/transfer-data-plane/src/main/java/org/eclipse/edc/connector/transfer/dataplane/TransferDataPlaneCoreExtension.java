@@ -124,8 +124,6 @@ public class TransferDataPlaneCoreExtension implements ServiceExtension {
 
         var consumerProxyTransformer = new ConsumerPullTransferProxyTransformer(proxyResolver, proxyReferenceService);
         transformerRegistry.registerTransformer(consumerProxyTransformer);
-
-        context.getMonitor().info("ivo - TransferDataPlaneCoreExtension - initialize");
     }
 
     /**
