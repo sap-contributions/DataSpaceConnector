@@ -29,7 +29,7 @@ dependencies {
     implementation(libs.junit.jupiter.api)
     runtimeOnly(libs.junit.jupiter.engine)
 
-    implementation("org.junit-pioneer:junit-pioneer:2.0.0")
+    implementation("org.junit-pioneer:junit-pioneer:2.0.1")
 }
 
 
