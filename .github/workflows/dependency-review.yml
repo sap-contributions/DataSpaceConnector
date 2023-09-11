@@ -14,7 +14,7 @@ jobs:
     continue-on-error: false
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@v3
         with:
@@ -32,7 +32,7 @@ jobs:
   Dash-Dependency-Check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-build
       - name: Download latest Eclipse Dash
         run: |
@@ -70,7 +70,7 @@ jobs:
   Dependency-Analysis:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-build
 
       - name: Dependency rules report
