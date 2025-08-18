@@ -15,7 +15,7 @@ jobs:
   Prepare-Release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # create tag on the current branch using GitHub's own API
       - name: Create tag on current branch (main)
@@ -74,7 +74,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: main
       - name: Create GitHub Release
@@ -92,7 +92,7 @@ jobs:
     needs: [ Prepare-Release, Github-Release ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: eclipse-edc/.github/.github/actions/bump-version@main
         with:
           target_branch: "main"
